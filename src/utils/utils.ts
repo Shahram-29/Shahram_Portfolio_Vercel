@@ -25,8 +25,12 @@ type Metadata = {
 import { notFound } from "next/navigation";
 
 function getMDXFiles(dir: string) {
+  // A missing directory means there is simply no content of that kind yet —
+  // git does not track empty directories, so this is the normal state on a
+  // fresh clone. Returning [] lets generateStaticParams produce no routes;
+  // calling notFound() here would instead fail the production build.
   if (!fs.existsSync(dir)) {
-    notFound();
+    return [];
   }
 
   return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");

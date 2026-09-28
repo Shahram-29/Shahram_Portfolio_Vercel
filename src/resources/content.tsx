@@ -161,6 +161,29 @@ const about: About = {
     title: "Work Experience",
     experiences: [
       {
+        company: "Independent (freelance)",
+        timeframe: "2025 – present",
+        role: "Financial Documentation Review",
+        achievements: [
+          <>
+            Reviewed personal bank statements and supporting financial records for more than
+            ten student visa applicants, identifying the deposits and transaction patterns a
+            visa officer would expect to see evidenced.
+          </>,
+          <>
+            Advised on which supporting documents substantiate each source of funds — salary
+            records, tax returns, sponsor declarations, property and loan documentation — and
+            where a stated source was not yet supported by the paperwork.
+          </>,
+          <>
+            The work is source-of-funds review in substance: the question is always whether
+            the documentary trail actually supports the balance on the statement, which is the
+            same test applied in KYC and client due diligence.
+          </>,
+        ],
+        images: [],
+      },
+      {
         company: "NaqCoDE Technologies Pvt Ltd",
         timeframe: "Oct 2024 – Aug 2025",
         role: "Finance Associate",
@@ -261,7 +284,7 @@ const about: About = {
             forecasting, GARCH/HAR benchmarks and LSTM models — each project carries unit tests.
           </>
         ),
-        tags: [{ name: "Python", icon: "python" }],
+        tags: [{ name: "Python", icon: "rocket" }],
         images: [
           {
             src: "/images/projects/month-end-revenue-bridge.png",
@@ -279,7 +302,7 @@ const about: About = {
             project writes its MRR bridge, retention and cohort tables entirely in SQL over DuckDB.
           </>
         ),
-        tags: [{ name: "SQL", icon: "database" }],
+        tags: [{ name: "SQL", icon: "grid" }],
         images: [
           {
             src: "/images/projects/saas-cohort-retention.png",
@@ -298,7 +321,7 @@ const about: About = {
             FP&A.
           </>
         ),
-        tags: [{ name: "Excel", icon: "grid" }],
+        tags: [{ name: "Excel", icon: "document" }],
         images: [],
       },
       {
@@ -318,6 +341,19 @@ const about: About = {
             height: 9,
           },
         ],
+      },
+      {
+        title: "Source-of-funds review",
+        description: (
+          <>
+            Reading a personal bank statement against the story it is supposed to support:
+            which deposits need a documented origin, which supporting records establish it,
+            and where the paperwork does not yet back the balance. The same test used in KYC
+            and client due diligence.
+          </>
+        ),
+        tags: [{ name: "Due diligence", icon: "eye" }],
+        images: [],
       },
     ],
   },

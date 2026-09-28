@@ -24,6 +24,7 @@ Then open http://localhost:3000 (it redirects to `/finance`).
 | Track headlines and featured badges | the `tracks` object in `src/resources/content.tsx` |
 | Colours, fonts, enabled routes, site URL | `src/resources/once-ui.config.ts` |
 | Project case studies | `src/app/work/projects/*.mdx` |
+| Analysis code behind a case study | `projects/<name>/` (Python; not part of the site build) |
 | Notes/blog posts | `src/app/blog/posts/*.mdx` |
 | Images | `public/images/` |
 

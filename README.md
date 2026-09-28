@@ -64,8 +64,13 @@ It is off because there are no posts yet. To enable it:
 ## Deploying
 
 Push to GitHub, then import the repository at [vercel.com/new](https://vercel.com/new).
-Vercel detects Next.js automatically — no build configuration needed. Every push to `main`
-redeploys.
+Every push to `main` redeploys.
+
+**Set Root Directory to `./`.** The import wizard may offer `projects/pakistan-payroll`
+instead, because that folder contains Python; pointed there it tries to deploy the payroll
+engine as a web service and fails with "No python entrypoint found". `vercel.json` pins the
+framework to Next.js, but it is only read from whichever directory is configured as the
+root — so the root has to be right first.
 
 ## Licence
 

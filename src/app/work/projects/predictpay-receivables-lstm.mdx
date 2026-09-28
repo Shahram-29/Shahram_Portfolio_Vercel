@@ -1,0 +1,38 @@
+---
+title: "PredictPay: an LSTM decision-support tool for accounts receivable"
+publishedAt: "2026-05-15"
+track: "research"
+tag: "Team project"
+summary: "Team project for Project Management for Business Analytics, MSc Business Analytics, DBS. An LSTM-based decision support system for B2B finance teams that forecasts which customers will pay late, turning a backlog of overdue invoices into a prioritised worklist. Designed to integrate with Xero and Sage."
+images: []
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/predictpay"
+---
+
+> Team project with Amjad Ali and Abdul Rehman, for Project Management for Business Analytics on the MSc Business Analytics at Dublin Business School. Delivered as a proposal and slide deck — a designed system with a worked model, not a deployed product.
+
+## The problem it addresses
+
+A small finance team with fifty-plus overdue invoices has no good way to decide who to chase first. Ageing buckets sort by *how late* an invoice is, which is not the same as *how likely it is to stay unpaid* — and chasing in the wrong order costs collections.
+
+## The proposal
+
+An LSTM trained on payment history to forecast, per customer, the probability of late payment on an open invoice. The output is not a score in a dashboard; it is a **prioritised worklist** — the order a credit controller should work through on Monday morning.
+
+The design covers:
+
+- **Automated receivables tracking**, so the ledger position is current without manual export
+- **A late-payment forecast per customer**, from sequence history rather than a static ageing bucket
+- **Integration points for Xero and Sage**, because a tool that needs its own data entry will not be used
+- **A prioritised worklist** as the primary interface
+
+## What I took from it
+
+This was the project that connected my finance-operations background to the analytics side of the MSc directly — the reconciliation and AP work I had done at Nawaz Construction is exactly the process this is trying to improve.
+
+It also led on to the [receivables cash forecast](/work/receivables-cash-forecast) in my Irish FP&A portfolio, which I built solo afterwards and backtested properly against held-out collections. PredictPay is the design; that one is the tested implementation of the same idea.
+
+## Scope, honestly
+
+This was coursework: a proposal, an architecture and a model, assessed as a project-management deliverable. It was not deployed against a real company's ledger, and the integration with Xero and Sage is designed rather than built.
+
+Proposal and slides: [github.com/Shahram-29/Portfolio](https://github.com/Shahram-29/Portfolio/tree/main/projects/predictpay).

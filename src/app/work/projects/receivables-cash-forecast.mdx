@@ -1,0 +1,41 @@
+---
+title: "Receivables: a cash forecast that was checked against what happened"
+publishedAt: "2026-09-05"
+track: "finance"
+tag: "Credit control"
+summary: "Ageing, DSO, a late-payment risk model and a survival-based cash collection forecast — backtested against actual collections. Assuming every invoice is paid on its due date overstated September collections by €1.5m; the behaviour-based forecast came within 3%."
+images:
+  - "/images/projects/ar-forecast-backtest.png"
+  - "/images/projects/ar-ageing-dso.png"
+link: "https://irish-fpa-receivables.streamlit.app/"
+---
+
+## The problem
+
+Most cash forecasts assume invoices are paid when they are due. Customers do not behave that way, and the gap between the two is the difference between a treasury plan that works and one that does not.
+
+This project builds the receivables book properly — ageing, DSO, a late-payment risk model per customer — and then forecasts collections from how customers have actually paid, using a survival-based model.
+
+## The backtest is the point
+
+![Forecast versus actual collections](/images/projects/ar-forecast-backtest.png)
+
+Assuming every invoice was paid on its due date **overstated September collections by €1.5m**. The behaviour-based forecast came **within 3%** of what was actually collected.
+
+The repository also documents the model's first version, which missed customers whose payment behaviour had changed partway through the period, and how that was fixed. Showing the version that failed is deliberate: a forecast you have not backtested is a guess with a chart attached.
+
+## Ageing and DSO
+
+![Ageing and DSO](/images/projects/ar-ageing-dso.png)
+
+The ageing view and DSO trend are the operational half of the same work — the part a credit controller uses day to day to decide who to chase and in what order.
+
+Built with scikit-learn and pandas. Nine unit tests, run on every push.
+
+## An honest note on the data
+
+**The company data is simulated.** The customers, invoices and payment histories are invented to exercise the model. The backtest is a genuine out-of-sample test against held-back data, but it is held-back *simulated* data — it shows the method works on data of this shape, not that it produced €1.5m of value for a real business.
+
+## Where it came from
+
+This is one of four projects in the [Irish FP&A Portfolio](https://github.com/Shahram-29/Irish-FPA-Portfolio), which grew out of three years working in accounts payable, reconciliation and reporting — the kinds of problem I kept meeting in spreadsheets and wanted to solve properly.

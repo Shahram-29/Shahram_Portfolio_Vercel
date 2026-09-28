@@ -1,0 +1,49 @@
+---
+title: "Month-end FP&A pipeline: from GL export to board pack"
+publishedAt: "2026-09-10"
+track: "finance"
+tag: "FP&A"
+summary: "A month-end close for a multinational's EMEA headquarters, end to end: general ledger export, data checks, conversion to EUR at ECB rates, budget-versus-actual, a volume/price/FX bridge, a headcount bridge, a 12-month rolling forecast, written commentary and a PowerPoint board pack."
+images:
+  - "/images/projects/month-end-revenue-bridge.png"
+  - "/images/projects/month-end-rolling-forecast.png"
+link: "https://irish-fpa-month-end-pipeline.streamlit.app/"
+---
+
+## What it does
+
+This is the month-end close as a finance team actually runs it, written as a tested Python pipeline. It takes a general ledger export and produces the pack that goes to the board:
+
+- **Data checks** on the raw GL before anything is calculated — the pipeline refuses to continue if the ledger does not tie up.
+- **Currency conversion** to EUR at ECB reference rates, pulled from the ECB's own API.
+- **Budget versus actual** by P&L line, with materiality thresholds.
+- **A volume / price / FX bridge** that decomposes the revenue variance into effects that add back exactly to the total.
+- **A headcount bridge** showing where staff-cost variance came from.
+- **A 12-month rolling forecast**, reforecast from the latest actuals.
+- **Written commentary** and a **PowerPoint board pack** generated with `python-pptx`.
+
+Built with pandas, the ECB API and python-pptx. Twelve unit tests, run on every push through GitHub Actions.
+
+## The revenue variance, explained
+
+![Revenue bridge](/images/projects/month-end-revenue-bridge.png)
+
+The bridge splits the revenue variance into volume, price and exchange-rate effects that sum exactly to the reported gap. Working from the ledger alone, the pipeline surfaced every story that had been built into the data: discounting in the EU region, one large USD deal, R&D hiring running three people behind plan, and two data-entry errors.
+
+That last point is the one that matters in practice. A variance report that only tells you the number is different is not much use; the job is to say *why*, in terms a non-finance director can act on.
+
+## The rolling forecast
+
+![Rolling forecast](/images/projects/month-end-rolling-forecast.png)
+
+The forecast is rebuilt from the latest actuals each month rather than held to the original budget, so the gap between plan and expectation stays visible instead of being absorbed quietly.
+
+## An honest note on the data
+
+**The company data is simulated.** No real company publishes its ledger, so the figures here are invented to exercise the pipeline. The repository states plainly what is made up, what is real — the ECB exchange rates and the Irish tax rules — and what the results do and do not show.
+
+None of the numbers in this project should be read as measured business impact. What it demonstrates is the pipeline, the checks and the reasoning, not a commercial result.
+
+## Running it
+
+The live app is hosted free on Streamlit Community Cloud, so it sleeps when unused and the first visit can take up to a minute to wake it. The code, tests and full write-up are in the [Irish FP&A Portfolio repository](https://github.com/Shahram-29/Irish-FPA-Portfolio).

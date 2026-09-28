@@ -1,0 +1,57 @@
+---
+title: "Irish rules, in code: payroll tax, FRS 102, ECB curves and CSO inflation"
+publishedAt: "2026-08-10"
+track: "finance"
+tag: "Ireland"
+summary: "Four tested projects built on Irish rules and Irish and euro area data: 2026 PAYE/USC/PRSI net pay, a trial balance laid out to Companies Act 2014 Schedule 3, euro area yield curves rebuilt from ECB Svensson parameters, and Irish CPI against new mortgage rates."
+images:
+  - "/images/projects/irish-marginal-rates.png"
+  - "/images/projects/frs102-profit-bridge.png"
+  - "/images/projects/ecb-curve-snapshots.png"
+  - "/images/projects/cso-inflation-mortgages.png"
+link: "https://github.com/Shahram-29/Irish-Financial-Analytics"
+---
+
+## Irish payroll tax: two cliffs and a squeeze on low pay
+
+![Marginal rate by salary](/images/projects/irish-marginal-rates.png)
+
+A net-pay engine for 2026 — PAYE income tax, USC and Class A PRSI, including the PRSI rise from 4.2% to 4.35% on 1 October 2026. Checked against Revenue's 2026 worked examples and the Department of Social Protection's PRSI guide, with sixteen tests.
+
+Plotting the marginal rate across the salary range shows things the headline rates hide:
+
+- **Two cliffs.** At €13,000 the USC exemption ends and the next €100 of salary costs €82. At €18,300 PRSI starts and the next €100 costs €174.
+- **A low-pay squeeze.** Between €20,000 and €22,044 the tapering PRSI credit pushes the marginal rate to 42.9% — nearly as high as the 47.2% paid at €55,000.
+
+## FRS 102: a trial balance that has to tie up
+
+![Profit bridge](/images/projects/frs102-profit-bridge.png)
+
+Lays a trial balance out in the Companies Act 2014 Schedule 3 formats — a Format 1 profit and loss account and balance sheet, the notes, and eleven ratios with their formulas.
+
+It has four tie-up checks and **refuses to write anything until the numbers reconcile**. Each check is tested by feeding it the specific error it is meant to catch, which is the only way to know a validation actually validates.
+
+## Euro area yield curves from ECB parameters
+
+![The AAA yield curve on four dates](/images/projects/ecb-curve-snapshots.png)
+
+Rebuilds euro area yield curves from the ECB's published Svensson parameters and checks the result against the ECB's own published spot rates. Three things it shows:
+
+- **Negative everywhere.** In March 2020, AAA governments were paid to borrow at every maturity out to 30 years.
+- **Inverted.** In July 2023 the 2-year yield sat 0.64 points above the 10-year.
+- **Draghi's 2012 speech** cut the all-government 2-year yield by 30bp in a single day, while barely moving AAA yields.
+
+## Irish inflation against mortgage rates
+
+![Irish CPI inflation and new mortgage rates](/images/projects/cso-inflation-mortgages.png)
+
+Irish CPI from the CSO against new mortgage rates, 2003 to 2026, pulled live from the CSO and ECB APIs:
+
+- **Slow pass-through.** The ECB raised rates by 4.5 points across 2022–23; new Irish mortgage rates rose by about 1.6.
+- **Negative real rates.** Across 2022–2023, inflation averaged 7.1% against mortgage rates of 3.26%.
+
+## On the data
+
+Unlike the FP&A portfolio, **this data is real** — Revenue's rules, ECB published parameters and rates, CSO inflation series. The FRS 102 project uses a hand-worked sample company, which is stated in its README.
+
+Code, tests and full write-ups: [Irish Financial Analytics](https://github.com/Shahram-29/Irish-Financial-Analytics).

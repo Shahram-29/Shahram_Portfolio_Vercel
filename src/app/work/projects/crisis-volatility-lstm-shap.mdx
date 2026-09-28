@@ -1,0 +1,67 @@
+---
+title: "This Time Is Different? Explainable deep learning of crisis transmission into Irish equity volatility"
+publishedAt: "2026-09-25"
+track: "research"
+tag: "MSc dissertation"
+summary: "MSc dissertation, in progress. Does an LSTM forecast Irish equity volatility better than GARCH and HAR across four crises — and where does it get its signal? On the headline test the answer is no: the LSTM was significantly worse than GARCH. This is the result as measured, not as hoped for."
+images:
+  - "/images/projects/crisis-qlike-by-window.png"
+  - "/images/projects/crisis-shap-shares.png"
+  - "/images/projects/crisis-windows.png"
+link: "https://github.com/Shahram-29/This-Time-its-is-Different-"
+---
+
+> **Status: in progress.** This is my MSc Business Analytics dissertation at Dublin Business School. Results below are from my own completed runs; the work has not yet been examined, and final marks are expected in early 2027. Nothing here is a published finding.
+
+## The question
+
+When a crisis hits, how much of Irish equity volatility comes from home, and how much is imported — and does the answer depend on where the crisis started?
+
+Four windows, chosen because they began in different places: the **Global Financial Crisis** (US-origin), the **Irish sovereign debt crisis** (domestic), **COVID-19** (global), and the **2022 war and rate shock** (euro-area). Brexit 2016 is kept as a UK-origin validation check.
+
+## Design
+
+- **Sample:** January 2003 to August 2023, 5,243 complete trading days.
+- **Markets:** ISEQ as domestic, S&P 500 as the US channel, DAX as the euro-area channel — six inputs per day (returns and squared returns for each).
+- **Target:** forward 5-day realised variance from close-to-close returns.
+- **Models:** LSTM (look-back 22, 64 units, 2 layers) against **GARCH** and **HAR** benchmarks, walk-forward, 5 seeds.
+- **Scoring:** QLIKE as the primary loss, with Diebold–Mariano (HLN-corrected) tests for significance.
+- **Attribution:** GradientShap via Captum, 1,547 days × 5 seeds, additivity gap 0.020.
+
+One methodological decision worth naming: I had intended to use Garman–Klass range volatility, and dropped it. On Yahoo's ISEQ series the opening price equals the previous close on **38–75% of days** depending on the period, and Garman–Klass correlated with squared returns at only 0.41–0.61 before 2007. The data would not support the estimator, so the estimator changed.
+
+## The headline result: the LSTM lost
+
+![QLIKE by crisis window](/images/projects/crisis-qlike-by-window.png)
+
+Across all days, QLIKE was **LSTM 0.463, GARCH 0.380, HAR 0.414**. The LSTM was **significantly worse** than both benchmarks — Diebold–Mariano p = 0.0026 against GARCH and p = 0.0436 against HAR.
+
+My first hypothesis was that the LSTM would win. It did not, and the dissertation says so. The models were tuned once, before evaluation, and not retuned afterwards to rescue the hypothesis.
+
+By window, the LSTM's error was: calm 0.367, GFC **1.021** (its worst), Irish sovereign 0.455, COVID 0.562, 2022 **0.264** (its best), Brexit 2.556. There is a pattern in that — the LSTM does comparatively well in the shock it has the most recent history for, and falls apart in the one furthest from its training distribution.
+
+## Where the signal comes from
+
+![SHAP attribution shares by window](/images/projects/crisis-shap-shares.png)
+
+SHAP attribution shares across domestic, US and euro channels:
+
+| Window | Domestic | US | Euro |
+|---|---|---|---|
+| Calm | 0.523 | 0.266 | 0.211 |
+| GFC | 0.482 | 0.299 | 0.219 |
+| Irish sovereign | 0.512 | 0.252 | 0.236 |
+| COVID | 0.488 | 0.332 | 0.180 |
+| 2022 | 0.540 | 0.317 | 0.143 |
+
+The US share does rise in the US-origin crisis, as expected — but the domestic share does not fall the way the transmission hypothesis predicted, and in the euro-area shock the euro channel *falls*. Of the hypotheses tested, most were not supported; one held narrowly. The model also shifts its attention to the last one to five days during fast crises, while the Irish sovereign crisis — slow-moving — keeps a calm-period profile.
+
+## Why report it this way
+
+A dissertation that only reports the runs that worked is not evidence of anything. The interesting finding here is not "deep learning wins" — it is that a well-specified GARCH remains hard to beat on this series, and that an explainability method can show you *what a model is doing* even when the model is losing.
+
+Any additional analysis run after seeing the results is labelled exploratory in the write-up.
+
+## Code
+
+Data pipeline, benchmarks, LSTM, SHAP and figures: [github.com/Shahram-29/This-Time-its-is-Different-](https://github.com/Shahram-29/This-Time-its-is-Different-). The raw Yahoo data is excluded from the repository under their terms of use; the pipeline rebuilds it.

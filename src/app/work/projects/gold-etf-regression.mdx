@@ -1,0 +1,35 @@
+---
+title: "Gold ETF price regression: six models, tuned and compared honestly"
+publishedAt: "2026-05-10"
+track: "research"
+tag: "Machine learning"
+summary: "Applied Statistics and Machine Learning coursework on a 1,718-row, 23-feature gold-price dataset. Linear, Ridge and Lasso regression, Support Vector Regression, a Decision Tree and a Random Forest — each tuned with GridSearchCV and scored on hold-out R² against 5-fold cross-validated R²."
+images: []
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/gold-etf-regression"
+---
+
+> Applied Statistics and Machine Learning, CA2, MSc Business Analytics at Dublin Business School.
+
+## What it does
+
+Predicts a gold ETF's adjusted close from a 1,718-row, 23-feature dataset, comparing six regression approaches on the same split:
+
+- **Linear regression** as the baseline
+- **Ridge** and **Lasso** for regularisation
+- **Support Vector Regression**
+- **Decision Tree**
+- **Random Forest**
+
+Each is tuned with `GridSearchCV` and scored on **hold-out R² against 5-fold cross-validated R²**, with a final model-comparison chart.
+
+## Why both scores
+
+Reporting cross-validated R² alone flatters a model that has been tuned against the same folds; reporting hold-out R² alone is noisy on a dataset this size. Showing both side by side makes the gap visible, which is where over-fitting shows up first — the tree-based models in particular look better in cross-validation than they hold up out of sample.
+
+The habit of comparing a tuned model against a plainly-specified baseline is the one I carried into my [dissertation](/work/crisis-volatility-lstm-shap), where the baseline won.
+
+## Related coursework
+
+The same module produced a **used-car price prediction** study comparing an OLS baseline (statsmodels) against a tuned Support Vector Regressor on R² and RMSE, including feature engineering to parse engine horsepower out of free-text specifications.
+
+Code and notebooks: [github.com/Shahram-29/Portfolio](https://github.com/Shahram-29/Portfolio/tree/main/projects/gold-etf-regression).

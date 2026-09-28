@@ -1,0 +1,44 @@
+---
+title: "SaaS metrics in SQL: MRR bridge, cohorts, NRR and a cash-runway model"
+publishedAt: "2026-08-20"
+track: "finance"
+tag: "SQL"
+summary: "MRR bridge, cohort retention, NRR and GRR, CAC/LTV and payback, IFRS 15 deferred revenue, and a 36-month scenario model with cash runway — the reporting layer written entirely in SQL over DuckDB."
+images:
+  - "/images/projects/saas-cohort-retention.png"
+  - "/images/projects/saas-mrr-bridge.png"
+link: "https://irish-fpa-saas-metrics.streamlit.app/"
+---
+
+## Why SQL rather than pandas
+
+The MRR bridge, retention and cohort tables in this project are written as SQL, not as dataframe operations. That is a deliberate choice: in most finance teams the recurring-revenue reporting layer lives in the warehouse, and the person who can express a cohort table as a window function is more useful than the person who exports to Excel first.
+
+It runs on DuckDB, so the whole thing is reproducible from a file with no warehouse to provision.
+
+## Cohort retention
+
+![Cohort retention](/images/projects/saas-cohort-retention.png)
+
+The cohort view shows annual renewals as clear steps at months 12 and 24 — the shape you expect from annual contracts, and a useful check that the cohort logic is right before anyone reads conclusions off it.
+
+## The MRR bridge
+
+![ARR and MRR movements](/images/projects/saas-mrr-bridge.png)
+
+New, expansion, contraction and churn, reconciling opening to closing MRR. Alongside it the project covers:
+
+- **NRR and GRR** — net and gross revenue retention
+- **CAC, LTV and payback period**
+- **IFRS 15 deferred revenue** — the accounting view, not just the metrics view
+- **A 36-month scenario model** with cash runway under different growth and churn assumptions
+
+Nine unit tests, run on every push.
+
+## An honest note on the data
+
+**The company data is simulated.** The customers, subscriptions and cash balances are invented to exercise the calculations. What this shows is the modelling and the SQL, not a real company's performance.
+
+## Part of a set
+
+One of four projects in the [Irish FP&A Portfolio](https://github.com/Shahram-29/Irish-FPA-Portfolio).

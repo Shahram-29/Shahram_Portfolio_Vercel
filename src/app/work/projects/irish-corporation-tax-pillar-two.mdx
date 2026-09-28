@@ -1,0 +1,42 @@
+---
+title: "Irish corporation tax: why paying the R&D credit in cash costs €1.9m"
+publishedAt: "2026-08-28"
+track: "finance"
+tag: "Tax"
+summary: "Corporation tax, the 35% R&D credit and its instalments, preliminary tax, Pillar Two top-up tax, a three-year tax charge, and the cash and balance-sheet effect. Because Ireland pays the credit in cash, Pillar Two treats it as income — €1.10m of top-up tax instead of €3.04m."
+images:
+  - "/images/projects/ct-pillar-two.png"
+  - "/images/projects/ct-cash-tax.png"
+link: "https://irish-fpa-corporation-tax.streamlit.app/"
+---
+
+## The rule that surprises people
+
+Ireland's R&D tax credit is **payable in cash**. That sounds like a straightforward benefit, and for cash flow it is. But under the OECD's Pillar Two rules, a credit paid out in cash is treated as **income** rather than as a reduction in tax — which changes the effective tax rate the top-up calculation is measured against.
+
+![Top-up tax by R&D spend](/images/projects/ct-pillar-two.png)
+
+For the example company, that treatment means **€1.10m of top-up tax instead of €3.04m**. The chart traces how the top-up moves as R&D spend changes — the relationship is not the one most people expect before they work it through.
+
+## What the model covers
+
+- Corporation tax at the standard and higher rates
+- The **35% R&D credit**, including the instalment schedule it is paid over
+- **Preliminary tax** obligations and timing
+- **Pillar Two** top-up tax calculation
+- A **three-year tax charge** projection
+- The resulting **cash and balance-sheet** positions
+
+![Cash tax](/images/projects/ct-cash-tax.png)
+
+Written in Python against Revenue's published guidance, with thirteen unit tests.
+
+## An honest note on the data
+
+The **company is simulated** — the profits, R&D spend and group structure are invented. The **tax rules are real**, taken from Revenue guidance and the Pillar Two framework, and the tests check the calculations against worked examples.
+
+This is a model of the rules, not tax advice, and not a return anyone should file from.
+
+## Part of a set
+
+One of four projects in the [Irish FP&A Portfolio](https://github.com/Shahram-29/Irish-FPA-Portfolio), alongside the month-end pipeline, SaaS metrics and the receivables forecast.

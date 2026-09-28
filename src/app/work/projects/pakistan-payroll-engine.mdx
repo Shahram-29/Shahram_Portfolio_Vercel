@@ -1,0 +1,103 @@
+---
+title: "Pakistan payroll engine: tax, attendance and expenses for Tax Year 2025"
+publishedAt: "2026-09-28"
+track: "finance"
+tag: "Payroll"
+summary: "A monthly payroll run written as tested Python on the Finance Act 2024 rules — salaried income tax and section 149 withholding, attendance-linked pay, EOBI, expense policy checks, and a register that must reconcile before anything is paid. 36 tests."
+images:
+  - "/images/projects/pk-payroll-bridge.png"
+  - "/images/projects/pk-tax-rate-curve.png"
+  - "/images/projects/pk-attendance-cost.png"
+link: "https://github.com/Shahram-29/Pakistan-Payroll-Analytics"
+---
+
+## Where this comes from
+
+I ran monthly payroll, company and individual taxation, expense control and
+attendance reporting as Finance Associate at NaqCoDE Technologies from October
+2024 to August 2025 — exactly the period Pakistan calls Tax Year 2025.
+
+That work stayed on the company's systems and **none of it appears here**. This
+project rebuilds the same problems from scratch on invented data, so the method
+can be shown without disclosing anything about a former employer or its staff.
+Every employee, salary, absence and claim below is simulated; the tax rules are
+real.
+
+## The payroll bridge
+
+![Payroll bridge](/images/projects/pk-payroll-bridge.png)
+
+Contractual salary is not what reaches the bank. Across the simulated year:
+**PKR 57.6m contracted**, 0.6m lost to unpaid absence, 0.9m added in overtime,
+**6.4m withheld in income tax** and 0.1m in EOBI, leaving **51.6m paid**.
+
+All twelve monthly registers reconcile — earned gross less deductions equals net
+pay, per employee and in total — and the report refuses to continue if a month
+does not tie. A payroll you cannot reconcile is a payroll you should not pay.
+
+## The tax curve, and a table that checks itself
+
+![Marginal and effective rate](/images/projects/pk-tax-rate-curve.png)
+
+Pakistan's salaried slabs are purely marginal, so unlike Ireland's USC there is
+no income at which earning one more rupee leaves you worse off — a test asserts
+that at every slab boundary.
+
+The more interesting test is on the slab table itself. The fixed amounts
+(30,000 / 180,000 / 430,000 / 700,000) are not hard-coded a second time as
+expected values: the suite recomputes each one from the marginal rates below it.
+A typo in the table fails the tests instead of quietly mispaying everyone.
+
+## Why a raise doubles the tax line
+
+One employee gets a 35% raise in January. Their **monthly tax deduction rises
+101%** — it doubles — because section 149 withholding spreads the whole year's
+liability across twelve months, and the raise moves them from the 15% slab into
+the 25% one.
+
+This is the question payroll gets asked every single time somebody is promoted.
+It is also why the engine withholds on annual contractual salary rather than on
+the month in hand.
+
+## What attendance actually costs
+
+![Unpaid absence by department](/images/projects/pk-attendance-cost.png)
+
+| Department | Pay lost to unpaid leave | % of that team's payroll |
+|---|---:|---:|
+| Operations | 266,725 | 2.79% |
+| Engineering | 131,386 | 0.66% |
+| Sales | 89,120 | 0.65% |
+| Finance | 75,930 | 0.53% |
+
+Operations loses roughly four times the share the other teams do. That is a
+number a manager can act on; a headline absence *rate* would not have shown the
+cost.
+
+Paid leave does not reduce pay, and unpaid leave is pro-rated on **working**
+days rather than calendar days. Getting that distinction wrong is one of the
+most common payroll errors, so it has its own test.
+
+## Expense claims
+
+266 claims across the year, 243 approved and 23 rejected. Every rejection
+carries a reason that can be shown to the claimant — over the category limit,
+no receipt above PKR 5,000, outside the 60-day window, or dated before the
+expense was incurred. Anything above PKR 50,000 escalates to the finance head
+rather than a line manager.
+
+Each check is tested by feeding it the specific error it exists to catch, which
+is the only way to know a validation still validates.
+
+## On the rules
+
+Pinned to **Tax Year 2025** (Finance Act 2024) because that is the year I
+worked. The Finance Act 2025 changed the slabs again for TY2026 — the 5% band
+fell to 1% and the 15% band to 11% — so the slab table is versioned data rather
+than constants scattered through the code, and another year can be added
+without touching the calculation.
+
+Slabs cross-checked against PwC Worldwide Tax Summaries, Befiler and EY's
+Finance Bill 2024 alert. It is a model of the rules, not tax advice.
+
+Code and tests: [github.com/Shahram-29/Pakistan-Payroll-Analytics](https://github.com/Shahram-29/Pakistan-Payroll-Analytics).

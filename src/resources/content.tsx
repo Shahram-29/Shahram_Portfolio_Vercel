@@ -69,6 +69,13 @@ const tracks = {
       ),
       href: "/work/month-end-fpa-pipeline",
     },
+    hero: "/images/hero-finance.jpg",
+    stats: [
+      { value: "3 yrs", label: "finance operations: payroll, reporting, reconciliation, AP" },
+      { value: "4", label: "FP&A apps live on Streamlit Community Cloud" },
+      { value: "6", label: "finance projects published, all tested" },
+      { value: "10+", label: "visa applicants' financials reviewed (freelance)" },
+    ],
     subline: (
       <>
         I'm {person.firstName}, a finance professional in Dublin finishing an{" "}
@@ -101,6 +108,13 @@ const tracks = {
       ),
       href: "/work/crisis-volatility-lstm-shap",
     },
+    hero: "/images/hero-research.jpg",
+    stats: [
+      { value: "5,243", label: "trading days analysed, Jan 2003 to Aug 2023" },
+      { value: "3", label: "models benchmarked: LSTM, GARCH, HAR" },
+      { value: "4", label: "crisis windows compared by origin" },
+      { value: "1,547", label: "days attributed with SHAP, across 5 seeds" },
+    ],
     subline: (
       <>
         I'm {person.firstName}, an{" "}

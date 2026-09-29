@@ -12,6 +12,7 @@ import {
 import { about, baseURL, person, tracks } from "@/resources";
 import { Projects } from "@/components/work/Projects";
 import { TrackSwitcher } from "@/components/TrackSwitcher";
+import { TrackStats } from "@/components/TrackStats";
 
 /**
  * Shared layout for the two track landing pages (/finance and /research).
@@ -35,7 +36,19 @@ export function TrackHome({ track }: { track: "finance" | "research" }) {
           image: `${baseURL}${person.avatar}`,
         }}
       />
-      <Column fillWidth horizontal="center" gap="m">
+      <Column
+        fillWidth
+        horizontal="center"
+        gap="m"
+        paddingY="32"
+        radius="l"
+        border="neutral-alpha-weak"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(11,20,24,0.55), rgba(11,20,24,0.88)), url(${t.hero})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <RevealFx fillWidth horizontal="center" paddingTop="8" paddingBottom="24">
           <TrackSwitcher active={track} />
         </RevealFx>
@@ -96,6 +109,9 @@ export function TrackHome({ track }: { track: "finance" | "research" }) {
           </RevealFx>
         </Column>
       </Column>
+      <RevealFx fillWidth translateY="12" delay={0.5}>
+        <TrackStats stats={t.stats} />
+      </RevealFx>
       <RevealFx translateY="16" delay={0.6}>
         <Projects track={track} range={[1, 1]} />
       </RevealFx>

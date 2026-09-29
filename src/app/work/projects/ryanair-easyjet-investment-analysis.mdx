@@ -1,0 +1,114 @@
+---
+title: "Ryanair vs easyJet: a five-year investment case, and a test of what AI gets wrong"
+publishedAt: "2026-04-12"
+track: "finance"
+tag: "Equity research"
+summary: "A comparative financial and market analysis of Ryanair Holdings plc and easyJet plc for a client investment decision — ratio analysis from the annual reports, a five-year price and moving-average study, and a controlled test of whether AI can compute financial ratios reliably."
+images:
+  - "/images/projects/air-cumulative-returns.png"
+  - "/images/projects/air-ryanair-annotated.png"
+  - "/images/projects/air-ma-crossover.png"
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/ryanair-vs-easyjet"
+---
+**Key finding.** Asked to compute 32 financial ratios without being given the accounts, AI matched the hand calculations **8 times out of 32** — easyJet's 2023 gearing came back as 2.2513 against a hand figure of 0.4047. Given the actual PDFs, the fabrication stopped entirely.
+
+> Group assignment for the MSc Business Analytics at Dublin Business School,
+> submitted 12 April 2026. Team: Abdul Rehman, Amjad Ali, Arjun Chowdhary and
+> Shahram Sajawal. Written as a consulting report for a client — "prepared for
+> Woods plc by Platinum Consultants plc" — recommending one of two airlines for
+> investment. **My contribution was the quantitative and charting work**: the
+> Python suite behind the price, moving-average, heatmap, volatility and
+> drawdown analysis below.
+
+## The recommendation
+
+**Ryanair**, and the five-year record is the reason. Over April 2021 to April
+2026, Ryanair returned **+42%** while easyJet lost roughly **60%** of its value.
+
+![Cumulative returns](/images/projects/air-cumulative-returns.png)
+
+The argument is not that Ryanair avoided trouble — it is that Ryanair kept
+recovering from it. The Ukraine invasion, the Boeing delivery crisis, the Iran
+escalation: each knocked the share price down and each time it came back higher
+than before. That pattern traces to structural things rather than luck — owned
+rather than leased aircraft, better fuel hedging, and a cleaner balance sheet.
+
+By the end of the period Ryanair carried 200 million passengers in FY2025, had
+returned over €9bn to shareholders since 2008, and traded around 18% below its
+all-time high.
+
+easyJet is genuinely better than it was in 2022 — debt cleared, the holidays
+business growing, a record 2025 result. But the stock sits 60% below where it
+was five years earlier and was approaching a **second death cross** on the
+moving averages.
+
+## The price history, annotated
+
+![Ryanair share price with news events](/images/projects/air-ryanair-annotated.png)
+
+Each phase of the five years is tied to what actually happened: post-pandemic
+pent-up demand in mid-2021, the Omicron travel bans in late 2021, the
+Russia–Ukraine fuel shock that drove a five-year low in 2022, then the recovery
+through 2023–25.
+
+Annotating a price series with events is the difference between a chart that
+shows *what* happened and one that explains *why*. A reader who does not follow
+aviation can still follow the argument.
+
+![Moving average crossovers](/images/projects/air-ma-crossover.png)
+
+The moving averages tell the same story more coldly: Ryanair's long-term uptrend
+under pressure but unbroken; easyJet's weak and approaching another bearish
+signal.
+
+## The part I would actually talk about in an interview
+
+The team ran a controlled test of whether AI can be trusted to compute financial
+ratios, across Ryanair and easyJet for 2023 and 2024. Two methods, and the
+difference between them is the whole lesson.
+
+**Method 1 — no source documents.** The model was asked for the ratios directly,
+leaving it to rely on training data and whatever it could scrape. Of **32 values,
+8 matched** the hand calculations. It invented figures freely. easyJet's 2023
+gearing came back as **2.2513 against a hand-calculated 0.4047** — out by more
+than 1.8. ROE was off by 0.74. It got net margin right, and little else, because
+net margin is the number printed everywhere.
+
+**Method 2 — given the actual annual report PDFs.** Of **16 values, 9 matched**,
+and net margin was correct 4 times out of 4.
+
+The interesting part is what the remaining seven disagreements turned out to be.
+**They were not hallucinations.** They were accounting judgment:
+
+- **Gearing** — airlines lease aircraft at scale, and under IFRS 16 those leases
+  are capitalised. The model included operating leases in the debt figure; the
+  hand calculation did not. Both are defensible; they are not the same ratio.
+- **Interest cover** — gross versus net interest expense, which are different
+  numbers in a company that hedges.
+- **Hedging** — jet fuel and currency hedges leave derivative accounting all
+  through the statements, and a model will default to the simple treatment
+  unless told otherwise.
+
+The conclusion the team drew: grounding the model in the source documents
+eliminates fabrication, but it does not eliminate disagreement — because gearing
+has no single agreed formula, and two analysts will not match either. What is
+needed is not just the PDFs but the **stated formula** for each ratio.
+
+That is a more useful finding than "AI is unreliable", and it is the reason I
+would raise this one rather than the recommendation.
+
+## Method
+
+- Ratio analysis across four families — liquidity and solvency, profitability,
+  efficiency, and investment — computed by hand from the published annual
+  reports for 2023 and 2024
+- A five-year price study, April 2021 to April 2026, split into seven phases per
+  airline and tied to news events
+- 50/200-day moving averages and crossover signals
+- Monthly return heatmaps, rolling volatility, drawdown and cumulative return
+  comparison
+- Bond and funding structure for both carriers, with issue sizes, coupons and
+  credit ratings
+
+5,602 words, fully referenced to the companies' annual reports, FAA and
+Financial Times sources.

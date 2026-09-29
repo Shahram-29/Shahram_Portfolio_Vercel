@@ -73,7 +73,7 @@ const tracks = {
     stats: [
       { value: "3 yrs", label: "finance operations: payroll, reporting, reconciliation, AP" },
       { value: "4", label: "FP&A apps live on Streamlit Community Cloud" },
-      { value: "9", label: "finance case studies, each with tested code" },
+      { value: "10", label: "finance case studies, from payroll to equity research" },
       { value: "10+", label: "visa applicants' financials reviewed (freelance)" },
     ],
     subline: (

@@ -60,14 +60,14 @@ const tracks = {
       display: true,
       title: (
         <Row gap="12" vertical="center">
-          <strong className="ml-4">Irish FP&A Portfolio</strong>
+          <strong className="ml-4">NaqCoDE finance function</strong>
           <Line background="brand-alpha-strong" vert height="20" />
           <Text marginRight="4" onBackground="brand-medium">
-            Four live apps
+            Rebuilt in code, 78 tests
           </Text>
         </Row>
       ),
-      href: "/work/month-end-fpa-pipeline",
+      href: "/work/pakistan-payroll-engine",
     },
     hero: "/images/hero-finance.jpg",
     stats: [

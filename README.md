@@ -58,7 +58,9 @@ It is off because there are no posts yet. To enable it:
 ## Before deploying
 
 - [ ] **Replace `public/images/avatar.jpg`** — it is currently a generated "SS" placeholder, not a photo
-- [ ] Set `baseURL` in `src/resources/once-ui.config.ts` to the real deployed URL (currently `https://shahram-sajawal.vercel.app`)
+- [x] `baseURL` in `src/resources/once-ui.config.ts` points at the live site
+      (`https://shahram-portfolio-vercel-liart.vercel.app`) — change it here if the
+      Vercel project is renamed or a custom domain is added
 - [ ] Optionally delete the unused template images in `public/images/gallery/`
 
 ## Deploying

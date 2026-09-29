@@ -10,125 +10,139 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from payroll import chart_theme as T
 from payroll import reconciliation as rec_mod
 from payroll import simulate
 from payroll import vouchers as v_mod
 
 sys.stdout.reconfigure(encoding="utf-8")
+T.apply()
 
 FIG = "figures"
-INK = "#1a1a1a"
-TEAL = "#2a9d8f"
-RED = "#e76f51"
-BLUE = "#457b9d"
-SLATE = "#264653"
 
 
 def fig_reconciliation():
+    """A waterfall that starts at the opening balance, not at zero.
+
+    Drawing 3,892k and 265k from a common zero makes the adjustments — the
+    entire content of a reconciliation — invisible. The axis starts just below
+    the smaller of the two balances so the steps are legible.
+    """
     ledger, statement = simulate.build_bank_month()
     rec = rec_mod.reconcile(ledger, statement, opening_ledger=4_200_000, opening_bank=4_200_000)
     s = rec_mod.statement_of_reconciliation(rec)
 
-    labels = [
-        "Balance per\nbank statement",
-        "Add: deposits\nin transit",
-        "Less: unpresented\npayments",
-        "Adjusted\nbalance",
-        "Balance per\ncash book",
-        "Less: unrecorded\nbank items",
-        "Adjusted\nbalance",
-    ]
-    vals = [
-        s["balance_per_bank_statement"],
-        s["add_deposits_in_transit"],
-        s["less_unpresented_payments"],
-        s["adjusted_bank_balance"],
-        s["balance_per_cash_book"],
-        s["unrecorded_bank_items"],
-        s["adjusted_book_balance"],
+    steps = [
+        ("Balance per\nbank statement", s["balance_per_bank_statement"], "start"),
+        ("Add: deposits\nin transit", s["add_deposits_in_transit"], "delta"),
+        ("Less: unpresented\npayments", s["less_unpresented_payments"], "delta"),
+        ("Adjusted", s["adjusted_bank_balance"], "total"),
+        ("Balance per\ncash book", s["balance_per_cash_book"], "start"),
+        ("Less: unrecorded\nbank items", s["unrecorded_bank_items"], "delta"),
+        ("Adjusted", s["adjusted_book_balance"], "total"),
     ]
 
-    bottoms, heights, colours = [], [], []
+    # Work out the true extent of every bar, including the running total
+    # during the adjustment steps, so nothing clips.
+    tops, bottoms_seen, run = [], [], 0.0
+    for _, value, kind in steps:
+        if kind in ("start", "total"):
+            run = value
+            tops.append(value); bottoms_seen.append(value)
+        else:
+            lo, hi = sorted((run, run + value))
+            tops.append(hi); bottoms_seen.append(lo)
+            run += value
+    hi_all, lo_all = max(tops), min(bottoms_seen)
+    span = hi_all - lo_all
+    floor = lo_all - span * 1.6
+    ceiling = hi_all + span * 0.42
+    lows = [v for _, v, kind in steps if kind != "delta"]
+
+    fig, ax = plt.subplots(figsize=(11.5, 5.8))
     run = 0.0
-    for i, v in enumerate(vals):
-        if i in (0, 4):  # starting balances
-            bottoms.append(0); heights.append(v); colours.append(SLATE); run = v
-        elif i in (3, 6):  # totals
-            bottoms.append(0); heights.append(v); colours.append(TEAL)
-        else:  # adjustments
-            bottoms.append(run if v >= 0 else run + v)
-            heights.append(abs(v))
-            colours.append(BLUE if v >= 0 else RED)
-            run += v
+    for i, (label, value, kind) in enumerate(steps):
+        if kind in ("start", "total"):
+            colour = T.NEUTRAL if kind == "start" else T.TOTAL
+            ax.bar(i, value - floor, bottom=floor, color=colour, width=0.6,
+                   edgecolor=T.SURFACE, linewidth=2)
+            run = value
+            ax.text(i, value + (ceiling - floor) * 0.02, f"{value/1000:,.0f}k",
+                    ha="center", fontsize=10, color=T.INK)
+        else:
+            bottom = run if value >= 0 else run + value
+            colour = T.POSITIVE if value >= 0 else T.NEGATIVE
+            ax.bar(i, abs(value), bottom=bottom, color=colour, width=0.6,
+                   edgecolor=T.SURFACE, linewidth=2)
+            ax.text(i, bottom + abs(value) + (ceiling - floor) * 0.02,
+                    f"{value/1000:+,.0f}k", ha="center", fontsize=10, color=colour)
+            run += value
 
-    fig, ax = plt.subplots(figsize=(11, 5.6))
-    ax.bar(range(len(vals)), heights, bottom=bottoms, color=colours, width=0.62)
-    for i, (b, h, v) in enumerate(zip(bottoms, heights, vals)):
-        ax.text(i, b + h + max(vals) * 0.015, f"{v/1000:,.0f}k",
-                ha="center", fontsize=9, color=INK)
+    ax.axhline(s["adjusted_bank_balance"], color=T.TOTAL, ls="--", lw=1, alpha=0.5)
+    ax.axvline(3.5, color="#2b3a3f", lw=1)
+    ax.text(1.5, 0.955, "from the bank's side", transform=ax.get_xaxis_transform(),
+            ha="center", fontsize=10, color=T.INK_MUTED)
+    ax.text(5.0, 0.955, "from the books' side", transform=ax.get_xaxis_transform(),
+            ha="center", fontsize=10, color=T.INK_MUTED)
 
-    ax.axvline(3.5, color="0.75", ls="--", lw=1)
-    ax.text(1.5, max(vals) * 1.22, "from the bank's side", ha="center",
-            fontsize=10, color="0.35")
-    ax.text(5.0, max(vals) * 1.22, "from the books' side", ha="center",
-            fontsize=10, color="0.35")
-
-    ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels(labels, fontsize=8.5)
+    ax.set_xticks(range(len(steps)))
+    ax.set_xticklabels([s_[0] for s_ in steps], fontsize=9)
+    ax.set_ylim(floor, ceiling)
     ax.set_ylabel("PKR")
-    ax.set_ylim(0, max(vals) * 1.30)
-    ax.yaxis.set_major_formatter(lambda v, _: f"{v/1_000_000:.1f}m")
+    ax.yaxis.set_major_formatter(lambda v, _: f"{v/1_000_000:.2f}m")
     ax.set_title(
-        "Bank reconciliation, June 2025 (simulated)\n"
-        "both sides meet at the same adjusted balance",
+        "Bank reconciliation, June 2025 — both sides meet at 3.77m\n"
+        "axis starts below the balances so the adjustments are visible",
         fontsize=12,
     )
-    ax.grid(axis="y", alpha=0.25)
+    T.despine(ax)
+    ax.grid(axis="x", visible=False)
     fig.tight_layout()
     fig.savefig(f"{FIG}/reconciliation_bridge.png", dpi=140)
     plt.close(fig)
-    print("reconciliation figure written; ties:", not rec_mod.check(rec)[:1] or "with exceptions")
+    print("reconciliation figure written")
 
 
 def fig_voucher_control():
+    """A stat tile plus the refusals — not three identical bars.
+
+    The left panel used to be three bars all reading 34, which is a stat tile
+    that has not noticed. When the story is one number, the number is the chart.
+    """
     vouchers, blocked = simulate.build_vouchers()
     summary = v_mod.control_summary(vouchers)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5), width_ratios=[1.05, 1])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5), width_ratios=[0.85, 1.15])
 
-    # left: the three-step flow, with headcount at each gate
-    steps = ["Prepared\n(finance)", "Approved\n(director / CEO)", "Disbursed\n(CEO / director)"]
-    counts = [summary["raised"], summary["raised"], summary["disbursed"]]
-    ax1.bar(steps, counts, color=[BLUE, TEAL, SLATE], width=0.55)
-    for i, c in enumerate(counts):
-        ax1.text(i, c + 0.6, str(c), ha="center", fontsize=11, color=INK)
-    ax1.set_ylim(0, max(counts) * 1.22)
-    ax1.set_ylabel("Vouchers")
-    ax1.set_title(
-        f"Every payment passed three people\n"
-        f"segregation of duties: {summary['segregation_rate']:.0%}",
-        fontsize=11,
+    T.hero(
+        ax1,
+        f"{summary['segregation_rate']:.0%}",
+        "segregation of duties",
+        f"all {summary['disbursed']} payments passed three\n"
+        f"different people: prepare, approve, disburse",
     )
-    ax1.grid(axis="y", alpha=0.25)
 
-    # right: what the control refused
     refusals = [
         "Preparer approving\ntheir own voucher",
         "Above the director's\nPKR 100k authority",
         "Payment before\napproval",
         "Preparer releasing\nthe payment",
     ]
-    ax2.barh(refusals[::-1], [1] * 4, color=RED, height=0.5)
-    for i in range(4):
-        ax2.text(1.04, i, "refused", va="center", fontsize=10, color=RED)
-    ax2.set_xlim(0, 1.7)
+    y = range(len(refusals))
+    ax2.barh(list(y), [1] * 4, color=T.NEGATIVE, height=0.42,
+             edgecolor=T.SURFACE, linewidth=2)
+    for i in y:
+        ax2.text(1.05, i, "refused", va="center", fontsize=10.5, color=T.NEGATIVE)
+    ax2.set_yticks(list(y))
+    ax2.set_yticklabels(refusals[::-1] if False else refusals, fontsize=9.5)
+    ax2.invert_yaxis()
+    ax2.set_xlim(0, 1.75)
     ax2.set_xticks([])
-    ax2.tick_params(labelsize=9)
-    ax2.set_title("Four ways money could have left\nand what happened to each", fontsize=11)
-    for side in ("top", "right", "bottom"):
-        ax2.spines[side].set_visible(False)
+    ax2.set_title("Four ways money could have left", fontsize=11.5)
+    T.despine(ax2, keep=("left",))
+    ax2.grid(visible=False)
 
-    fig.suptitle("Expense payment voucher control, June 2025 (simulated)", fontsize=12.5)
+    fig.suptitle("Expense payment voucher control, June 2025 (simulated)", fontsize=13)
     fig.tight_layout()
     fig.savefig(f"{FIG}/voucher_control.png", dpi=140)
     plt.close(fig)

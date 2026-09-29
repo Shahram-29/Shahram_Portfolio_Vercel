@@ -1,0 +1,63 @@
+---
+title: "Twelve months of expenses, matched to the receipts"
+publishedAt: "2026-09-25"
+track: "finance"
+tag: "Vouching"
+summary: "244 expense lines against 238 receipts across a full year: 99.1% of claimed value supported, 18 exceptions. Coverage measured by value rather than count, because nine small vouched claims do not offset one large unsupported one."
+images:
+  - "/images/projects/pk-vouching-coverage.png"
+link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects/pakistan-payroll"
+---
+
+> Part of the NaqCoDE finance function, rebuilt on simulated data. I built and
+> matched twelve months of expense records against their receipts as Finance
+> Associate.
+
+## A different question from the policy check
+
+A policy check asks whether a claim was **allowed** — within the category
+limit, receipted, submitted in time. Vouching asks whether a document actually
+**exists** behind the money that left.
+
+They are not the same test, and an auditor puts the second one first. A claim
+can be perfectly within policy and still have nothing behind it.
+
+## The year
+
+![Receipt coverage by month](/images/projects/pk-vouching-coverage.png)
+
+**244 expense lines, 238 receipts on file, 99.1% of claimed value supported**,
+18 exceptions to follow up.
+
+Coverage is measured **by value, not by count** — and there is a test asserting
+exactly that. Nine PKR 1,000 vouched lines against one PKR 91,000 unvouched
+line scores **9%, not 90%**. A count-based metric reads 90% and hides the
+entire problem, which is precisely the number a weak process would report.
+
+## Four failures, four different problems
+
+| Finding | What it means |
+|---|---|
+| A line with no receipt | Unsupported payment |
+| A receipt nobody claimed | Cost possibly never recorded |
+| Claim and receipt disagree | Over- or under-claim |
+| **One receipt on two lines** | The same cost paid twice |
+
+## Why the last one is the point
+
+A receipt supporting two separate claims passes **every other check**. The
+claim sits inside the category limit. The amount ties to a genuine document.
+The approval trail is complete and properly segregated. Nothing in the monthly
+reporting looks wrong.
+
+The only way to find it is to match receipt numbers across the whole year and
+notice that one appears twice. That is why the exceptions report lists
+duplicates first, above mismatches and missing receipts — it is the finding
+least likely to surface any other way.
+
+## Tests
+
+Eighteen tests, each feeding one specific way the match can fail: a missing
+receipt, an unclaimed receipt, an over-claim, an under-claim, a receipt used
+twice, a receipt dated months from its expense, and coverage measured on the
+wrong basis.

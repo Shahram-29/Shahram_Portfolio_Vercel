@@ -1,0 +1,64 @@
+---
+title: "Bank reconciliation: naming every difference"
+publishedAt: "2026-09-27"
+track: "finance"
+tag: "Reconciliation"
+summary: "Cash book against bank statement — matching on reference first, then on amount within a clearing window, and classifying what is left rather than listing it. The check refuses to pass while an unrecorded bank item remains."
+images: []
+link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects/pakistan-payroll"
+---
+
+> Part of the NaqCoDE finance function, rebuilt on simulated data. I reconciled
+> the company bank accounts monthly from October 2024 to August 2025, and did
+> the same work at Nawaz Construction before that.
+
+## The question a reconciliation actually asks
+
+Not "do the two balances match" — they almost never do, and that is not an
+error. The question is whether every difference between them can be **named**.
+Whatever is left unnamed is the thing worth looking at.
+
+That distinction decides the whole design. A tool that just reports a gap is
+useless; a tool that accounts for the gap line by line, and then refuses to
+sign off on the remainder, is doing the job.
+
+## Matching in two passes
+
+**Reference first, then amount within a ten-day clearing window** — because a
+cheque written on the 28th may not clear until the 3rd.
+
+The order matters, and it has its own test. Two payments of the same value in
+the same month will happily match each other if you go on amount alone; taking
+exact reference matches first means a coincidental amount cannot steal a
+reference that belongs to another line.
+
+## Classifying what is left
+
+Leftovers get sorted into three groups, because they are three different
+problems:
+
+- **Unpresented payments** — written in the books, not yet through the bank.
+  Normal, and they reverse next month.
+- **Deposits in transit** — lodged but not yet credited. Also normal.
+- **Items on the statement that never reached the books** — bank charges,
+  interest, a standing order nobody posted. **Not normal.** These need a
+  journal, and they are the only category that represents a genuine error in
+  the ledger.
+
+`check()` refuses to pass a reconciliation while any of that third group
+remains outstanding. That is the difference between a reconciliation that is
+*balanced* and one that is *done*.
+
+## Stale items
+
+`stale_items()` flags reconciling items older than thirty days. An unpresented
+cheque still outstanding after a month is usually lost, never sent, or already
+replaced — each of which needs somebody to do something, and none of which
+resolve on their own. Left alone they roll forward month after month and
+quietly become permanent.
+
+## Tests
+
+Eight tests, including the two that matter most: that reference matching beats
+a coincidental amount match, and that an item on the statement with no entry in
+the cash book blocks sign-off rather than being silently absorbed.

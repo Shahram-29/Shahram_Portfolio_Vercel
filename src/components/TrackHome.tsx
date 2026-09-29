@@ -10,7 +10,7 @@ import {
   Text,
 } from "@once-ui-system/core";
 import { about, baseURL, person, tracks } from "@/resources";
-import { Projects } from "@/components/work/Projects";
+import { WorkGrid } from "@/components/work/WorkGrid";
 import { TrackSwitcher } from "@/components/TrackSwitcher";
 import { TrackStats } from "@/components/TrackStats";
 
@@ -112,10 +112,9 @@ export function TrackHome({ track }: { track: "finance" | "research" }) {
       <RevealFx fillWidth translateY="12" delay={0.5}>
         <TrackStats stats={t.stats} />
       </RevealFx>
-      <RevealFx translateY="16" delay={0.6}>
-        <Projects track={track} range={[1, 1]} />
+      <RevealFx fillWidth translateY="16" delay={0.6}>
+        <WorkGrid track={track} />
       </RevealFx>
-      <Projects track={track} range={[2]} />
     </Column>
   );
 }

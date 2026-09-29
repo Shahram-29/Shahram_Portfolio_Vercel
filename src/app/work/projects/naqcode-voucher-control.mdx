@@ -1,0 +1,71 @@
+---
+title: "The voucher control: prepare, approve, disburse"
+publishedAt: "2026-09-26"
+track: "finance"
+tag: "Internal control"
+summary: "Segregation of duties written down as code. The person who raises a voucher cannot approve it; the person who approves it cannot release the cash. The approved amount is frozen at sign-off and re-checked at payment."
+images: []
+link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects/pakistan-payroll"
+---
+
+> Part of the NaqCoDE finance function, rebuilt on simulated data. This is the
+> control I designed and ran in practice as Finance Associate: I raised the
+> vouchers, a director approved them, the CEO released the payment.
+
+## The control
+
+```
+prepare  ->  approve  ->  disburse
+(finance)    (director)   (CEO)
+```
+
+Three people, three steps, and **no one person can move money alone**. That is
+the entire point. It is the oldest control in accounting and it is still the
+one that catches the most.
+
+## Most of the module is refusals
+
+A control that cannot say no is not a control. So the code is mostly the list
+of things it will not allow:
+
+- **Self-approval** — the preparer approving their own voucher
+- **The preparer or the approver releasing the payment**
+- **Disbursement before approval** — the payment gate re-checks the approval
+  rather than trusting the earlier step ran
+- **Approval above the director's PKR 100,000 authority** without the CEO
+- **A voucher with no narrative** — it cannot be approved on its face if it
+  does not say what the payment is for
+- **Back-dating**, in either direction: approving before the voucher was
+  raised, or paying before it was approved
+
+## The one I would point at in an interview
+
+**The approved amount is frozen at approval and re-checked at payment.**
+
+Edit the figure after the director signs and it fails at the CEO gate:
+
+```
+V001: amount changed from PKR 25,000.00 to PKR 250,000.00
+after approval — must be re-approved
+```
+
+Without that, the approval signature means very little. A director signs a form
+saying 25,000 and the bank sends 250,000, and every document in the file still
+looks correct. This is the difference between a control and a form.
+
+## Evidence that it operated
+
+`find_duplicate_payments()` catches the classic double payment — same payee,
+same amount, inside thirty days.
+
+`control_summary()` reports the **segregation rate**: the share of disbursed
+vouchers where the preparer, approver and disburser were three distinct people.
+That number is what an auditor actually asks for. Not that the control exists —
+anyone can show you a policy document — but that it operated, on every payment,
+across the year.
+
+## Tests
+
+Sixteen tests, and each one feeds the control the specific breach it exists to
+stop. A control that is never fed its own failure case has not been tested; it
+has only been observed not to complain.

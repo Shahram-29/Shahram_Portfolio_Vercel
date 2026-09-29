@@ -1,0 +1,82 @@
+---
+title: "Payroll and tax: a year of Pakistani salaried withholding"
+publishedAt: "2026-09-28"
+track: "finance"
+tag: "Payroll & tax"
+summary: "Salaried income tax under the Finance Act 2024, section 149 monthly withholding, attendance-linked pay and EOBI — twelve monthly registers, each of which must reconcile before anything is paid."
+images:
+  - "/images/projects/pk-payroll-bridge.png"
+  - "/images/projects/pk-tax-rate-curve.png"
+link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects/pakistan-payroll"
+---
+
+> Part of the NaqCoDE finance function, rebuilt on simulated data. I ran this
+> work as Finance Associate from October 2024 to August 2025 — exactly the
+> period Pakistan calls Tax Year 2025. The company records stayed on the
+> company's systems; every employee and figure here is invented, and the tax
+> rules are real.
+
+## The payroll bridge
+
+![Payroll bridge](/images/projects/pk-payroll-bridge.png)
+
+Contractual salary is not what reaches the bank. Across the simulated year:
+**PKR 57.6m contracted**, 0.6m lost to unpaid absence, 0.9m added in overtime,
+**6.4m withheld in income tax** and 0.1m in EOBI, leaving **51.6m paid**.
+
+All twelve monthly registers reconcile — earned gross less deductions equals
+net pay, per employee and in total — and the run refuses to continue if a month
+does not tie. A payroll you cannot reconcile is a payroll you should not pay.
+
+## The tax curve, and a table that checks itself
+
+![Marginal and effective rate](/images/projects/pk-tax-rate-curve.png)
+
+Pakistan's salaried slabs are purely marginal, so unlike Ireland's USC there is
+no income at which earning one more rupee leaves you worse off. A test asserts
+that at every slab boundary.
+
+The more interesting test is on the slab table itself. The fixed amounts
+(30,000 / 180,000 / 430,000 / 700,000) are not hard-coded a second time as
+expected values — the suite recomputes each one from the marginal rates below
+it. A typo in the table fails the tests instead of quietly mispaying everyone.
+
+## Why a raise doubles the tax line
+
+One employee gets a 35% raise in January. Their **monthly deduction rises 101%**
+— it doubles — because section 149 withholding spreads the whole year's
+liability across twelve months, and the raise moves them from the 15% slab into
+the 25% one.
+
+This is the question payroll gets asked every single time somebody is promoted,
+and it is why the engine withholds on annual contractual salary rather than on
+the month in hand.
+
+## Attendance, and what it actually costs
+
+![Unpaid absence by department](/images/projects/pk-attendance-cost.png)
+
+| Department | Pay lost to unpaid leave | % of that team's payroll |
+|---|---:|---:|
+| Operations | 266,725 | 2.79% |
+| Engineering | 131,386 | 0.66% |
+| Sales | 89,120 | 0.65% |
+| Finance | 75,930 | 0.53% |
+
+Operations loses roughly four times the share the other teams do — a number a
+manager can act on, where a headline absence *rate* would not have shown the
+cost.
+
+Paid leave does not reduce pay, and unpaid leave is pro-rated on **working**
+days rather than calendar days. Getting that distinction wrong is one of the
+most common payroll errors, so it has its own test.
+
+## On the rules
+
+Pinned to **Tax Year 2025** (Finance Act 2024) because that is the year I
+worked. The Finance Act 2025 changed the slabs again for TY2026 — the 5% band
+fell to 1% and the 15% band to 11% — so the slab table is versioned data rather
+than constants scattered through the code.
+
+Slabs cross-checked against PwC Worldwide Tax Summaries, Befiler and EY's
+Finance Bill 2024 alert. A model of the rules, not tax advice.

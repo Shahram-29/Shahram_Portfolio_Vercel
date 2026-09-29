@@ -67,13 +67,13 @@ const tracks = {
           </Text>
         </Row>
       ),
-      href: "/work/pakistan-payroll-engine",
+      href: "/work/naqcode-payroll-tax",
     },
     hero: "/images/hero-finance.jpg",
     stats: [
       { value: "3 yrs", label: "finance operations: payroll, reporting, reconciliation, AP" },
       { value: "4", label: "FP&A apps live on Streamlit Community Cloud" },
-      { value: "6", label: "finance projects published, all tested" },
+      { value: "9", label: "finance case studies, each with tested code" },
       { value: "10+", label: "visa applicants' financials reviewed (freelance)" },
     ],
     subline: (

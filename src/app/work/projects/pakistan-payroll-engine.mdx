@@ -3,7 +3,7 @@ title: "Pakistan payroll engine: tax, attendance and expenses for Tax Year 2025"
 publishedAt: "2026-09-28"
 track: "finance"
 tag: "Payroll"
-summary: "A monthly payroll run written as tested Python on the Finance Act 2024 rules — salaried income tax and section 149 withholding, attendance-linked pay, EOBI, expense policy checks, and a register that must reconcile before anything is paid. 36 tests."
+summary: "A monthly finance function written as tested Python on the Finance Act 2024 rules — payroll and section 149 withholding, attendance-linked pay, bank reconciliation, and an expense payment voucher that enforces segregation of duties in code. 60 tests."
 images:
   - "/images/projects/pk-payroll-bridge.png"
   - "/images/projects/pk-tax-rate-curve.png"
@@ -13,9 +13,11 @@ link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects
 
 ## Where this comes from
 
-I ran monthly payroll, company and individual taxation, expense control and
-attendance reporting as Finance Associate at NaqCoDE Technologies from October
-2024 to August 2025 — exactly the period Pakistan calls Tax Year 2025.
+I ran monthly payroll, company and individual taxation, bank reconciliation,
+expense control and attendance reporting as Finance Associate at NaqCoDE
+Technologies from October 2024 to August 2025 — exactly the period Pakistan
+calls Tax Year 2025 — and supported the senior auditor in preparing the
+financial statements.
 
 That work stayed on the company's systems and **none of it appears here**. This
 project rebuilds the same problems from scratch on invented data, so the method
@@ -88,6 +90,49 @@ rather than a line manager.
 
 Each check is tested by feeding it the specific error it exists to catch, which
 is the only way to know a validation still validates.
+
+## Bank reconciliation
+
+A reconciliation is not "do the two balances match" — they almost never do, and
+that is not an error. The question is whether every difference can be **named**.
+Whatever is left unnamed is the thing worth looking at.
+
+The matcher runs two passes: exact reference first, then amount within a ten-day
+clearing window, because a cheque written on the 28th may not clear until the
+3rd. Reference matching goes first so two payments of the same value cannot be
+swapped by a coincidental amount match — that has its own test.
+
+What remains gets classified rather than listed: payments in the books that have
+not reached the bank, lodgements the bank has not yet credited, and items on the
+statement that never reached the books at all. That last group is the one that
+needs a journal, and the check refuses to pass while any remain.
+
+## The voucher control
+
+This is the internal control I designed and ran, written down as code:
+
+```
+prepare  ->  approve  ->  disburse
+(finance)    (director)   (CEO)
+```
+
+No one person can move money alone. The person who raises the voucher cannot
+approve it; the person who approves it cannot release the cash.
+
+Most of the module is refusals, because a control that cannot say no is not a
+control. It blocks self-approval, the preparer or approver releasing payment,
+disbursement before approval, approval above the director's PKR 100,000
+authority without the CEO, a voucher with no narrative, and back-dating in
+either direction.
+
+The one I like most: **the approved amount is frozen at approval and re-checked
+at payment**. Edit the figure after the director signs and it fails at the CEO
+gate rather than quietly paying the larger amount.
+
+There is also duplicate detection — same payee, same amount, within thirty days
+— and a control summary reporting the segregation rate across disbursed
+vouchers. That last number is what an auditor actually asks for: not that the
+control exists, but that it operated.
 
 ## On the rules
 

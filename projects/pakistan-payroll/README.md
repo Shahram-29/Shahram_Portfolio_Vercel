@@ -17,9 +17,11 @@ read as a measured business result.
 | [`payroll/attendance.py`](payroll/attendance.py) | Working days to payable days; paid vs unpaid leave; overtime at 1.5× | 8 |
 | [`payroll/payslip.py`](payroll/payslip.py) | Payslip, monthly register, EOBI, and a reconciliation that must pass before anything is paid | 5 |
 | [`payroll/expenses.py`](payroll/expenses.py) | Category limits, receipt thresholds, a 60-day claim window, approval escalation | 9 |
+| [`payroll/reconciliation.py`](payroll/reconciliation.py) | Cash book against bank statement: reference and window matching, unpresented cheques, deposits in transit, unrecorded bank items | 8 |
+| [`payroll/vouchers.py`](payroll/vouchers.py) | Expense payment vouchers with segregation of duties — prepare, approve, disburse — approval limits and duplicate detection | 16 |
 
 ```bash
-py -3 -m unittest discover -s tests -t .   # 36 tests
+py -3 -m unittest discover -s tests -t .   # 60 tests
 py -3 report.py                            # runs the year, writes figures/
 ```
 
@@ -93,6 +95,57 @@ a line manager.
 
 Each check is tested by feeding it the specific error it exists to catch, which
 is the only way to know a validation still validates.
+
+## Bank reconciliation
+
+A reconciliation is not "do the two balances match" — they almost never do, and
+that is not an error. The question is whether every difference can be *named*.
+Anything left unnamed is the thing worth looking at.
+
+The matcher works in two passes: exact reference first, then amount within a
+ten-day clearing window, because a cheque written on the 28th may not clear
+until the 3rd. Reference matching runs first so that two payments of the same
+value cannot be swapped by a coincidental amount match — which has its own test.
+
+What is left over is classified rather than dumped in a list: payments in the
+books that have not reached the bank (unpresented), lodgements the bank has not
+yet credited (in transit), and items on the statement that never reached the
+books at all — charges, interest, direct debits. That last group is the one
+that needs a journal, and `check()` refuses to pass a reconciliation while any
+remain. `stale_items()` flags reconciling items older than 30 days, which are
+usually lost, never sent, or already replaced.
+
+## Expense payment vouchers, and the control behind them
+
+This is the internal control I designed and ran in practice, written down as
+code:
+
+```
+prepare  ->  approve  ->  disburse
+(finance)    (director)   (CEO)
+```
+
+No one person can move money alone. The person who raises the voucher cannot
+approve it; the person who approves it cannot release the cash.
+
+Most of `vouchers.py` is refusals, because a control that cannot say no is not
+a control. It blocks:
+
+- **self-approval** — the preparer approving their own voucher
+- **the preparer or the approver releasing the payment**
+- **disbursement before approval**
+- **an amount edited after sign-off** — the approved figure is frozen at approval
+  and re-checked at payment, so raising the amount after the director signs
+  fails at the CEO gate
+- **approval above the director's PKR 100,000 authority** without the CEO
+- **a voucher with no narrative**, which cannot be approved on its face
+- **back-dating** — approving before the voucher was raised, or paying before
+  it was approved
+
+`find_duplicate_payments()` catches the classic double payment: same payee,
+same amount, inside thirty days. `control_summary()` reports the segregation
+rate across disbursed vouchers, which is the evidence an auditor actually asks
+for — not that the control exists, but that it operated.
 
 ## Sources for the tax rules
 

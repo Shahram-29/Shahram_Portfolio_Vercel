@@ -201,8 +201,18 @@ const about: About = {
             about 20% and cutting manual data entry.
           </>,
           <>
-            Ran end-to-end monthly payroll and acted as the main point of contact for internal and
-            external auditors during the annual audit.
+            Reconciled company bank accounts monthly against the cash book, identifying
+            unpresented payments, lodgements in transit and charges that had never been
+            recorded, and clearing the resulting journals.
+          </>,
+          <>
+            Designed and operated the expense payment voucher control — vouchers raised in
+            finance, approved by a director, disbursed by the CEO — so that no single person
+            could release a payment, and every payment carried an approval trail.
+          </>,
+          <>
+            Ran end-to-end monthly payroll, prepared individual and company tax filings, and
+            supported the senior auditor in preparing the annual financial statements.
           </>,
         ],
         images: [],
@@ -341,6 +351,19 @@ const about: About = {
             height: 9,
           },
         ],
+      },
+      {
+        title: "Internal control design",
+        description: (
+          <>
+            Segregation of duties written down as code: prepare, approve, disburse, with the
+            approved amount frozen at sign-off and re-checked at payment. Plus bank
+            reconciliation that classifies every difference rather than listing it, and
+            refuses to pass while an unrecorded bank item remains.
+          </>
+        ),
+        tags: [{ name: "Controls", icon: "document" }],
+        images: [],
       },
       {
         title: "Source-of-funds review",

@@ -1,0 +1,47 @@
+---
+title: "JPMorgan Chase: a reusable pipeline from raw prices to a forecast"
+publishedAt: "2026-03-15"
+track: "research"
+tag: "Time series"
+summary: "Programming for Analytics CA2. End-to-end analysis of JPM stock data in Python — a reusable load-and-clean function, Augmented Dickey-Fuller stationarity testing, risk quantification, and a supervised linear-regression forecast evaluated on R²."
+images: []
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/jpmorgan-predictive-pipeline"
+---
+
+> Programming for Analytics, CA2, MSc Business Analytics, Dublin Business
+> School. January to March 2026.
+
+## The work
+
+An end-to-end analysis of JPMorgan Chase stock data in Python, built as a
+pipeline rather than a notebook that runs top to bottom once:
+
+- **A reusable load-and-clean function** — date normalisation and missing-value
+  handling, written so it takes any ticker rather than being hard-coded to this
+  one
+- **Augmented Dickey-Fuller testing** for stationarity
+- **Risk quantification** from the return series
+- **A supervised linear-regression forecast**, evaluated on R²
+- **Reporting charts** in seaborn
+
+## Why the stationarity test comes first
+
+Fitting a regression to a raw price series produces an impressive R² and means
+nothing — prices trend, so a model that predicts "roughly yesterday's price"
+scores extremely well while carrying no information at all.
+
+Running the Augmented Dickey-Fuller test first is what establishes whether you
+are modelling a series that can be modelled, or fitting to a trend. It is the
+step that decides whether the rest of the pipeline is worth running, which is
+why it sits before the model rather than in an appendix.
+
+## What carried forward
+
+The reusable loader is the piece that mattered beyond the assignment. The same
+pattern — one function that takes a ticker and returns a clean, date-indexed
+frame — is what the
+[dissertation pipeline](/work/crisis-volatility-lstm-shap) is built on, where
+it handles four indices across twenty years instead of one stock across five.
+
+Notebook:
+[github.com/Shahram-29/Portfolio](https://github.com/Shahram-29/Portfolio/tree/main/projects/jpmorgan-predictive-pipeline).

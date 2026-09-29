@@ -1,0 +1,49 @@
+---
+title: "Bank term-deposit classifier: SMOTE, Random Forest and SVC"
+publishedAt: "2025-12-15"
+track: "research"
+tag: "Classification"
+summary: "Predicting which customers subscribe to a term deposit from the bank-marketing dataset. Binary mapping and dummy encoding, class rebalancing with SMOTE, then Decision Tree, Random Forest and SVC tuned with GridSearchCV and compared on accuracy and confusion matrices."
+images: []
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/bank-term-deposit-classifier"
+---
+
+> MSc Business Analytics, Dublin Business School. November to December 2025.
+
+## The work
+
+Classification on the bank-marketing dataset: which contacted customers go on
+to subscribe to a term deposit.
+
+- **Binary field mapping** and **dummy encoding** for job, marital status,
+  education and contact channel
+- **SMOTE** to rebalance the classes
+- **Decision Tree, Random Forest and SVC**, each tuned with `GridSearchCV`
+- Compared on **accuracy and confusion matrices**
+
+## Why the confusion matrix, not just accuracy
+
+This dataset is heavily imbalanced — the large majority of contacted customers
+do not subscribe. A model that predicts "no" for everybody scores very well on
+accuracy and is completely worthless, because it never identifies the customers
+the campaign exists to find.
+
+Reading the confusion matrix is what exposes that. It separates the two errors
+that matter in opposite directions: calling somebody a subscriber when they are
+not wastes a phone call; missing a genuine subscriber loses the deposit. Those
+costs are not symmetric, and a single accuracy figure hides both.
+
+## On SMOTE
+
+Rebalancing with SMOTE addresses the same problem from the training side rather
+than the evaluation side — the classifier sees enough of the minority class to
+learn something about it, instead of finding that "always predict no" minimises
+its loss.
+
+Worth being clear about the limit: SMOTE generates synthetic minority examples
+by interpolating between real ones. It helps the model learn a boundary, but it
+does not add information that was not in the data, and the evaluation still has
+to happen against the real class balance.
+
+Notebook:
+[github.com/Shahram-29/Portfolio](https://github.com/Shahram-29/Portfolio/tree/main/projects/bank-term-deposit-classifier).

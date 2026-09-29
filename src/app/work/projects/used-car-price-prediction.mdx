@@ -1,0 +1,48 @@
+---
+title: "Used car price prediction: OLS baseline against a tuned SVR"
+publishedAt: "2026-04-15"
+track: "research"
+tag: "Machine learning"
+summary: "Applied Statistics and Machine Learning coursework predicting used-car prices from listing data. Feature engineering on free-text specifications, then an OLS baseline in statsmodels against a Support Vector Regressor tuned with GridSearchCV, scored on R² and RMSE."
+images: []
+link: "https://github.com/Shahram-29/Portfolio/tree/main/projects/used-car-price-prediction"
+---
+
+> Applied Statistics and Machine Learning, MSc Business Analytics, Dublin
+> Business School. February to April 2026.
+
+## The work
+
+Predicting used-car prices from listing data, which is mostly a data-cleaning
+problem wearing a modelling problem's clothes.
+
+- **Cleaning and encoding** the raw listings into something a model can read
+- **Feature engineering** — the interesting part: engine horsepower had to be
+  parsed out of free-text specification strings rather than read from a column
+- **An OLS baseline** in `statsmodels`
+- **A Support Vector Regressor** tuned with `GridSearchCV`
+- Both scored on **R² and RMSE**
+
+## Why the baseline is the point
+
+It would have been quicker to fit the SVR alone and report its R². Running a
+plain OLS first is what makes that number mean anything — without it there is
+no way to say whether the tuning bought anything, or whether a linear model on
+well-engineered features would have done the same job for a fraction of the
+compute and none of the opacity.
+
+That habit is the one I carried into the
+[dissertation](/work/crisis-volatility-lstm-shap), where the benchmark won and
+the deep model lost. Reporting that honestly is only possible if the benchmark
+was run in the first place.
+
+## On the feature engineering
+
+Parsing horsepower out of free text is the kind of step that never appears in
+the write-up but decides the result. A specification field that reads
+`"2.0L 4cyl Turbo 248hp"` carries a number the model can use; left as a
+categorical string it carries almost nothing, because nearly every listing has
+a slightly different one.
+
+Code and notebook:
+[github.com/Shahram-29/Portfolio](https://github.com/Shahram-29/Portfolio/tree/main/projects/used-car-price-prediction).

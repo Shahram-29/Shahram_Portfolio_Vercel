@@ -1,5 +1,5 @@
 import { getPosts } from "@/utils/utils";
-import { Column, Heading, Row, SmartLink, Text } from "@once-ui-system/core";
+import { Column, Heading, Media, Row, SmartLink, Text } from "@once-ui-system/core";
 
 interface WorkGridProps {
   track?: string;
@@ -41,11 +41,22 @@ export function WorkGrid({ track, title = "Selected work", columns = "2" }: Work
               fillWidth
               fillHeight
               gap="8"
-              padding="20"
+              padding="12"
               radius="m"
               border="neutral-alpha-weak"
               background="surface"
             >
+              {post.metadata.images?.[0] && (
+                <Media
+                  src={post.metadata.images[0]}
+                  alt={post.metadata.title}
+                  aspectRatio="16 / 9"
+                  radius="s"
+                  sizes="(max-width: 960px) 100vw, 480px"
+                  marginBottom="8"
+                />
+              )}
+              <Column gap="8" paddingX="8" paddingBottom="8">
               {post.metadata.tag && (
                 <Row gap="8" vertical="center">
                   <Row
@@ -66,6 +77,7 @@ export function WorkGrid({ track, title = "Selected work", columns = "2" }: Work
               <Text variant="body-default-s" onBackground="neutral-weak" wrap="balance">
                 {post.metadata.summary}
               </Text>
+              </Column>
             </Column>
           </SmartLink>
         ))}

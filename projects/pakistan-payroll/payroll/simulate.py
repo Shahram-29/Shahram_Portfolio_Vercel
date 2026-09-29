@@ -263,3 +263,108 @@ def build_company(seed=42):
         "claims": build_expense_claims(employees, seed=seed),
         "months": MONTHS,
     }
+
+
+def build_bank_month(seed=42):
+    """One month of cash book and bank statement, with the usual differences.
+
+    Built so the reconciliation has something to find: cheques written late
+    that have not cleared, a lodgement banked on the last day, and bank items
+    nobody posted to the cash book.
+    """
+    from payroll.reconciliation import Entry
+
+    rng = random.Random(seed + 4)
+    ledger, statement = [], []
+
+    for i in range(18):
+        day = rng.randint(2, 24)
+        amount = round(rng.uniform(20_000, 400_000), -2) * (1 if rng.random() < 0.35 else -1)
+        ref = f"TX{i + 1:04d}"
+        ledger.append(Entry(date(2025, 6, day), f"Transaction {i + 1}", amount, ref))
+        statement.append(
+            Entry(date(2025, 6, min(28, day + rng.randint(0, 4))), f"REF {ref}", amount, ref)
+        )
+
+    for i in range(3):
+        ledger.append(
+            Entry(
+                date(2025, 6, 27 + (i % 2)),
+                f"Cheque {900 + i}",
+                -round(rng.uniform(40_000, 180_000), -2),
+            )
+        )
+    ledger.append(Entry(date(2025, 6, 30), "Customer lodgement", 265_000))
+
+    statement += [
+        Entry(date(2025, 6, 30), "Bank charges", -3_450),
+        Entry(date(2025, 6, 30), "Interest received", 1_180),
+        Entry(date(2025, 6, 18), "Standing order - insurance", -46_000),
+    ]
+    return ledger, statement
+
+
+def build_vouchers(seed=42):
+    """A month of payment vouchers, plus four attempts the control refuses."""
+    from payroll.vouchers import ControlBreach, Voucher, approve, disburse, prepare
+
+    rng = random.Random(seed + 5)
+    payees = [
+        "Al-Habib Stationers", "PSO Fuel Station", "Nayatel", "City Couriers",
+        "TechnoCity Computers", "Metro Cash & Carry", "Shaheen Travels",
+    ]
+    vouchers, blocked = [], []
+
+    for i in range(34):
+        amount = round(rng.uniform(5_000, 180_000), -2)
+        v = prepare(
+            Voucher(
+                voucher_no=f"V{i + 1:04d}",
+                payee=payees[i % len(payees)],
+                category="operating",
+                amount=amount,
+                raised_on=date(2025, 6, rng.randint(1, 20)),
+                prepared_by="finance",
+                narrative=f"Operating expense {i + 1}",
+            )
+        )
+        needs_ceo = amount > 100_000
+        approve(v, approver="ceo" if needs_ceo else "director", on=v.raised_on, is_ceo=needs_ceo)
+        # The CEO disburses routine spend; where the CEO approved it, a
+        # director releases it, so the three roles stay distinct.
+        disburse(v, payer="director" if needs_ceo else "ceo", on=v.raised_on)
+        vouchers.append(v)
+
+    # Four attempts that must be refused, one per rule.
+    def attempt(label, amount, action):
+        v = prepare(
+            Voucher(
+                voucher_no=f"X{label[:4].upper()}",
+                payee="Test payee",
+                category="operating",
+                amount=amount,
+                raised_on=date(2025, 6, 15),
+                prepared_by="finance",
+                narrative="Attempted breach",
+            )
+        )
+        try:
+            action(v)
+            blocked.append(f"{label}: NOT BLOCKED")
+        except ControlBreach as exc:
+            blocked.append(f"{label}: {exc}")
+
+    attempt("self-approval", 30_000,
+            lambda v: approve(v, approver="finance", on=v.raised_on))
+    attempt("over director limit", 250_000,
+            lambda v: approve(v, approver="director", on=v.raised_on))
+    attempt("pay before approval", 30_000,
+            lambda v: disburse(v, payer="ceo", on=v.raised_on))
+
+    def preparer_pays(v):
+        approve(v, approver="director", on=v.raised_on)
+        disburse(v, payer="finance", on=v.raised_on)
+
+    attempt("preparer disbursing", 30_000, preparer_pays)
+
+    return vouchers, blocked

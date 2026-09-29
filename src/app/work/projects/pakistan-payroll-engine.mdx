@@ -3,11 +3,12 @@ title: "Pakistan payroll engine: tax, attendance and expenses for Tax Year 2025"
 publishedAt: "2026-09-28"
 track: "finance"
 tag: "Payroll"
-summary: "A monthly finance function written as tested Python on the Finance Act 2024 rules — payroll and section 149 withholding, attendance-linked pay, bank reconciliation, and an expense payment voucher that enforces segregation of duties in code. 60 tests."
+summary: "A monthly finance function written as tested Python on the Finance Act 2024 rules — payroll and section 149 withholding, attendance-linked pay, bank reconciliation, an expense payment voucher that enforces segregation of duties, and twelve months of expenses matched line by line to the receipt file. 78 tests."
 images:
   - "/images/projects/pk-payroll-bridge.png"
   - "/images/projects/pk-tax-rate-curve.png"
   - "/images/projects/pk-attendance-cost.png"
+  - "/images/projects/pk-vouching-coverage.png"
 link: "https://github.com/Shahram-29/Shahram_Portfolio_Vercel/tree/main/projects/pakistan-payroll"
 ---
 
@@ -133,6 +134,31 @@ There is also duplicate detection — same payee, same amount, within thirty day
 — and a control summary reporting the segregation rate across disbursed
 vouchers. That last number is what an auditor actually asks for: not that the
 control exists, but that it operated.
+
+## Twelve months of expenses, matched to the receipts
+
+![Receipt coverage by month](/images/projects/pk-vouching-coverage.png)
+
+Policy checks ask whether a claim was *allowed*. Vouching asks whether a
+document actually exists behind the money that left — and that is the question
+an auditor puts first.
+
+Across the simulated year: **244 expense lines against 238 receipts, 99.1% of
+claimed value supported**, 18 exceptions to follow up.
+
+Coverage is measured **by value, not by count**. Nine small vouched claims do
+not offset one large unsupported one, and there is a test asserting exactly
+that — nine PKR 1,000 vouched lines against one PKR 91,000 unvouched line
+scores 9%, not 90%.
+
+Four failures, each a different problem: a line with no receipt, a receipt
+nobody claimed, a claim and receipt that disagree, and **one receipt supporting
+two lines**.
+
+That last one is why this is worth doing at all. It passes every other check —
+the claim is within policy, the amount ties to a real document, the approval
+trail is complete. Only matching receipt numbers across the whole year finds
+it. The exceptions report lists duplicates first.
 
 ## On the rules
 

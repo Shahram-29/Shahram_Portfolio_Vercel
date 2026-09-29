@@ -11,7 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from payroll import expenses, simulate, tax
+from payroll import expenses, simulate, tax, vouching
 from payroll.payslip import reconcile, register_totals, run_month
 
 sys.stdout.reconfigure(encoding="utf-8")
@@ -168,6 +168,40 @@ def fig_expenses(approved, rejected):
     plt.close(fig)
 
 
+def fig_vouching(lines, result):
+    """Receipt coverage month by month, with the exceptions alongside."""
+    monthly = vouching.monthly_coverage(lines, result)
+    months = list(monthly)
+    values = [monthly[m] * 100 for m in months]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5), width_ratios=[2, 1])
+    colours = ["#e76f51" if v < 95 else "#2a9d8f" for v in values]
+    ax1.bar(months, values, color=colours)
+    ax1.axhline(95, color="0.4", ls="--", lw=1, label="95% target")
+    ax1.set_ylim(0, 104)
+    ax1.set_ylabel("Expense value supported by a receipt (%)")
+    ax1.set_title("Receipt coverage by month", fontsize=11)
+    ax1.legend(frameon=False, fontsize=9)
+    ax1.grid(axis="y", alpha=0.25)
+    plt.setp(ax1.get_xticklabels(), rotation=45, ha="right")
+
+    counts = {
+        "No receipt": len(result.unvouched),
+        "Unclaimed receipt": len(result.orphan_receipts),
+        "Amount mismatch": len(result.amount_mismatches),
+        "Receipt reused": len(result.reused_receipts),
+    }
+    ax2.barh(list(counts)[::-1], list(counts.values())[::-1], color="#e76f51")
+    ax2.set_title("Exceptions found", fontsize=11)
+    ax2.set_xlabel("Items")
+    ax2.grid(axis="x", alpha=0.25)
+
+    fig.suptitle("Twelve-month expense vouching (simulated)", fontsize=12)
+    fig.tight_layout()
+    fig.savefig(f"{FIG}/vouching_coverage.png", dpi=140)
+    plt.close(fig)
+
+
 def main():
     company, df, raised, new_monthly = run_year()
     approved, rejected = expenses.process(company["claims"])
@@ -204,10 +238,27 @@ def main():
     print(f"  approved                {len(approved)}  {sum(r['amount'] for r in approved):,.0f}")
     print(f"  rejected                {len(rejected)}  {sum(r['amount'] for r in rejected):,.0f}")
 
+    lines, receipts = simulate.build_receipt_file(approved)
+    vres = vouching.voucher_match(lines, receipts)
+    vsum = vouching.summary(lines, receipts, vres)
+    print("\nTwelve-month expense vouching")
+    print(f"  expense lines           {vsum['expense_lines']}")
+    print(f"  receipts on file        {vsum['receipts_on_file']}")
+    print(f"  value claimed           {vsum['value_claimed']:>14,.0f}")
+    print(f"  receipt coverage        {vsum['value_coverage']:>13.1%}  (by value)")
+    print(f"  lines with no receipt   {vsum['unvouched_lines']}  ({vsum['unvouched_value']:,.0f})")
+    print(f"  receipts never claimed  {vsum['orphan_receipts']}")
+    print(f"  claim vs receipt differs{vsum['amount_mismatches']:>3}")
+    print(f"  receipts used twice     {vsum['reused_receipts']}")
+    print(f"  exceptions to follow up {vsum['exceptions']}")
+    for e in vouching.exceptions_report(vres)[:3]:
+        print(f"    {e[:96]}")
+
     fig_tax_curve()
     fig_payroll_bridge(df)
     fig_attendance_cost(df)
     fig_expenses(approved, rejected)
+    fig_vouching(lines, vres)
     print(f"\nFigures written to {FIG}/")
 
     df.to_csv("data/payroll_register_ty2025.csv", index=False)

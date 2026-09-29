@@ -16,6 +16,7 @@ from datetime import date, timedelta
 from payroll.attendance import MonthAttendance
 from payroll.expenses import CATEGORY_LIMITS, ExpenseClaim
 from payroll.payslip import Employee
+from payroll.vouching import ExpenseLine, Receipt
 
 # Tax Year 2025 runs July 2024 to June 2025.
 MONTHS = [
@@ -175,6 +176,81 @@ def build_expense_claims(employees, seed=42):
                      date(2025, 5, 3), date(2025, 5, 8), True),          # needs escalation
     ]
     return claims
+
+
+VENDORS = [
+    "Al-Habib Stationers", "Shaheen Travels", "PSO Fuel Station", "Metro Cash & Carry",
+    "Gourmet Foods", "Nayatel", "TechnoCity Computers", "City Couriers",
+]
+
+
+def build_receipt_file(approved_claims, seed=42):
+    """Turn approved claims into an expense register plus the receipt file.
+
+    Twelve months of both, with the failure modes a real vouching exercise
+    finds built in deliberately:
+      - a small share of lines with no receipt on file
+      - one receipt claimed twice
+      - a few claims that disagree with the receipt amount
+      - receipts on file that were never claimed
+    """
+    rng = random.Random(seed + 3)
+    lines, receipts = [], []
+
+    for i, claim in enumerate(approved_claims):
+        vendor = VENDORS[i % len(VENDORS)]
+        year, mm = (int(x) for x in claim["month"].split("-"))
+        spend_date = date(year, mm, rng.randint(1, 28))
+        receipt_no = f"R{i + 1:05d}"
+
+        # 7% of lines never had a receipt filed.
+        has_receipt = rng.random() > 0.07
+
+        # 4% of filed receipts disagree with what was claimed.
+        receipt_amount = claim["amount"]
+        if has_receipt and rng.random() < 0.04:
+            receipt_amount = round(claim["amount"] * rng.uniform(0.75, 1.25), -2)
+
+        lines.append(
+            ExpenseLine(
+                line_id=f"L{i + 1:05d}",
+                month=claim["month"],
+                vendor=vendor,
+                amount=claim["amount"],
+                expense_date=spend_date,
+                receipt_no=receipt_no if has_receipt else "",
+            )
+        )
+        if has_receipt:
+            receipts.append(
+                Receipt(
+                    receipt_no=receipt_no,
+                    vendor=vendor,
+                    amount=receipt_amount,
+                    receipt_date=spend_date,
+                )
+            )
+
+    # One receipt used to support two different claims.
+    if len(receipts) > 5:
+        reused = receipts[3]
+        lines.append(
+            ExpenseLine(
+                line_id="L90001",
+                month=lines[3].month,
+                vendor=reused.vendor,
+                amount=reused.amount,
+                expense_date=reused.receipt_date,
+                receipt_no=reused.receipt_no,
+            )
+        )
+
+    # Two receipts filed that nobody ever claimed against.
+    receipts += [
+        Receipt("R90001", "City Couriers", 6_400, date(2025, 2, 18)),
+        Receipt("R90002", "Nayatel", 7_100, date(2025, 5, 6)),
+    ]
+    return lines, receipts
 
 
 def build_company(seed=42):

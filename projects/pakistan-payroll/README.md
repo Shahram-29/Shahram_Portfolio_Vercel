@@ -19,9 +19,10 @@ read as a measured business result.
 | [`payroll/expenses.py`](payroll/expenses.py) | Category limits, receipt thresholds, a 60-day claim window, approval escalation | 9 |
 | [`payroll/reconciliation.py`](payroll/reconciliation.py) | Cash book against bank statement: reference and window matching, unpresented cheques, deposits in transit, unrecorded bank items | 8 |
 | [`payroll/vouchers.py`](payroll/vouchers.py) | Expense payment vouchers with segregation of duties — prepare, approve, disburse — approval limits and duplicate detection | 16 |
+| [`payroll/vouching.py`](payroll/vouching.py) | Twelve months of expense lines matched to the receipt file: unvouched lines, unclaimed receipts, amount mismatches, receipts used twice | 18 |
 
 ```bash
-py -3 -m unittest discover -s tests -t .   # 60 tests
+py -3 -m unittest discover -s tests -t .   # 78 tests
 py -3 report.py                            # runs the year, writes figures/
 ```
 
@@ -146,6 +147,34 @@ a control. It blocks:
 same amount, inside thirty days. `control_summary()` reports the segregation
 rate across disbursed vouchers, which is the evidence an auditor actually asks
 for — not that the control exists, but that it operated.
+
+## Twelve months of expenses, matched to the receipts
+
+![Receipt coverage](figures/vouching_coverage.png)
+
+A policy check asks whether a claim was *allowed*. Vouching asks whether a
+document actually exists behind the money that left — a different question, and
+the one an auditor puts first.
+
+Across the simulated year: **244 expense lines, 238 receipts, 99.1% of claimed
+value supported by a receipt**, and 18 exceptions to follow up.
+
+Coverage is measured **by value, not by count**, because nine small vouched
+claims do not offset one large unsupported one. There is a test that asserts
+exactly that: nine PKR 1,000 vouched lines against one PKR 91,000 unvouched one
+scores 9%, not 90%.
+
+Four things can go wrong and each is a different problem:
+
+- **a line with no receipt** — an unsupported payment
+- **a receipt nobody claimed** — a cost that may never have been recorded
+- **claim and receipt disagree** — an over- or under-claim
+- **one receipt on two lines** — the same cost paid twice
+
+The last is the one worth catching, because it looks clean on every other
+report: the claim is within policy, the amount matches a real document, the
+approval trail is complete. Only matching receipt numbers across the full year
+finds it. The exceptions report puts duplicates first for that reason.
 
 ## Sources for the tax rules
 
